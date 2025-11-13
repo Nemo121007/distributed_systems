@@ -1,0 +1,19 @@
+<app_info>
+    <app>
+        <name>iris_classifier</name>
+        <user_friendly_name>Iris Classifier</user_friendly_name>
+    </app>
+    <file_info>
+        <name>iris_classifier_app</name>
+        <executable/>
+    </file_info>
+    <app_version>
+        <app_name>iris_classifier</app_name>
+        <version_num>1</version_num>
+        <platform>x86_64-pc-linux-gnu</platform>
+        <file_ref>
+            <file_name>iris_classifier_app</file_name>
+            <main_program/>
+        </file_ref>
+    </app_version>
+</app_info>

@@ -1,0 +1,33 @@
+version: '3.12'
+
+services:
+  server:
+    build: ./server
+    ports:
+      - "8080:8080"
+    networks:
+      - boinc_net
+    volumes:
+      - ./server/results:/var/lib/boinc/projects/iris/results
+
+  client1:
+    build: ./client
+    depends_on:
+      - server
+    networks:
+      - boinc_net
+    volumes:
+      - ./client1_results:/tmp
+
+  client2:
+    build: ./client
+    depends_on:
+      - server
+    networks:
+      - boinc_net
+    volumes:
+      - ./client2_results:/tmp
+
+networks:
+  boinc_net:
+    driver: bridge
