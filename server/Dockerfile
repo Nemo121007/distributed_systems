@@ -9,15 +9,14 @@ RUN apt-get update && apt-get install -y \
 # Установка Python-зависимостей
 RUN pip3 install numpy scikit-learn
 
-# Создание директории проекта
-RUN mkdir -p /var/lib/boinc/projects/iris
+# Создание директорий
+RUN mkdir -p /shared/work /shared/results /shared/processed
 
 # Копирование файлов
-COPY app_info.xml /var/lib/boinc/projects/iris/
-COPY work_generator.py /var/lib/boinc/projects/iris/
+COPY work_generator.py /app/work_generator.py
 
 # Рабочая директория
-WORKDIR /var/lib/boinc/projects/iris
+WORKDIR /app
 
 # Запуск генератора заданий
 CMD ["python3", "work_generator.py"]

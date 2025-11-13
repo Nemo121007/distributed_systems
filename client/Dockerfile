@@ -6,17 +6,17 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Установка Python-зависимостей (для возможных зависимостей времени выполнения)
+# Установка Python-зависимостей
 RUN pip3 install numpy scikit-learn
 
-# Копируем приложение
-COPY iris_classifier_app /usr/local/bin/
+# Создание директорий
+RUN mkdir -p /shared/work /shared/results
 
-# Делаем исполняемым
-RUN chmod +x /usr/local/bin/iris_classifier_app
+# Копируем приложение
+COPY client_worker.py /app/client_worker.py
 
 # Рабочая директория
-WORKDIR /tmp
+WORKDIR /app
 
 # Запуск приложения
-CMD ["/usr/local/bin/iris_classifier_app"]
+CMD ["python3", "client_worker.py"]
