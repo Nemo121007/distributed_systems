@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOINC Iris Classification Project</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .status { padding: 20px; background: #f0f0f0; border-radius: 5px; margin: 20px 0; }
+        .results { padding: 20px; background: #e8f5e8; border-radius: 5px; margin: 20px 0; }
+        .client { padding: 10px; margin: 10px 0; border-left: 4px solid #007bff; }
+        h1 { color: #333; }
+        h2 { color: #666; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BOINC Iris Classification Project</h1>
+
+        <div class="status">
+            <h2>Project Status</h2>
+            <p>Project is running and ready to accept tasks.</p>
+            <p>Server URL: <a href="http://localhost:8080/irisproject">http://localhost:8080/irisproject</a></p>
+        </div>
+
+        <div class="results">
+            <h2>Results</h2>
+            <div id="results-container">
+                <p>Waiting for results...</p>
+            </div>
+        </div>
+
+        <div class="status">
+            <h2>Connected Clients</h2>
+            <div id="clients-container">
+                <div class="client">Client 1: <span id="client1-status">Connecting...</span></div>
+                <div class="client">Client 2: <span id="client2-status">Connecting...</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функция для обновления статуса
+        function updateStatus() {
+            fetch('/results/status.json')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('results-container').innerHTML = `
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                })
+                .catch(error => {
+                    console.log('Error fetching status:', error);
+                });
+        }
+
+        // Обновляем статус каждые 5 секунд
+        setInterval(updateStatus, 5000);
+        updateStatus();
+    </script>
+</body>
+</html>
