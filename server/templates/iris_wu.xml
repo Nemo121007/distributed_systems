@@ -1,0 +1,7 @@
+<workunit>
+  <file_info>
+    <name>input_data</name>
+    <sticky/>
+  </file_info>
+  <command_line>input_data output.txt</command_line>
+</workunit>

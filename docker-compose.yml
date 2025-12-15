@@ -1,63 +1,50 @@
+version: '3.8'
 services:
-  # BOINC клиент 1
-  boinc-client-1:
-    build: ./client
-    container_name: boinc-client-1
-    volumes:
-      - boinc_client_data_1:/var/lib/boinc
+  db:
+    image: mysql:5.7
     environment:
-      - BOINC_PROJECT_URL=http://boinc-server-docker-apache-1/boincserver
-      - BOINC_CLIENT_NAME=client-1
-      - CLIENT_ID=0
+      MYSQL_ROOT_PASSWORD: boinc
+      MYSQL_DATABASE: boinc
+    volumes:
+      - db_data:/var/lib/mysql
     networks:
-      - boinc-network
-    restart: unless-stopped
-    command: >
-      bash -c "
-        chmod +x /startup.sh &&
-        /startup.sh
-      "
+      boinc-net:
+        ipv4_address: 172.25.0.2
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
 
-  # BOINC клиент 2
-  boinc-client-2:
-    build: ./client
-    container_name: boinc-client-2
-    volumes:
-      - boinc_client_data_2:/var/lib/boinc
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      args:
+        BOINC_USER: boinc
+        PROJECT_ROOT: /var/lib/boinc
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      - BOINC_PROJECT_URL=http://boinc-server-docker-apache-1/boincserver
-      - BOINC_CLIENT_NAME=client-2
-      - CLIENT_ID=1
-    networks:
-      - boinc-network
-    restart: unless-stopped
-    command: >
-      bash -c "
-        chmod +x /startup.sh &&
-        /startup.sh
-      "
-
-  # Монитор результатов
-  results-monitor:
-    image: python:3.9-slim
-    container_name: results-monitor
+      - DB_HOST=172.25.0.2
+      - BOINC_DB_USER=root
+      - BOINC_DB_PASS=boinc
+      - PROJECT_ROOT=/var/lib/boinc
     volumes:
-      - "./scripts:/scripts"
-      - "boinc-server-docker_results:/results"
-    environment:
-      - MONITOR_INTERVAL=10
+      - ./server:/server
     networks:
-      - boinc-network
-    command: python /scripts/monitor_results.py
-    restart: unless-stopped
+      boinc-net:
+        ipv4_address: 172.25.0.3
 
 volumes:
-  boinc_client_data_1:
-  boinc_client_data_2:
-  boinc-server-docker_results:
-    external: true
+  db_data:
 
 networks:
-  boinc-network:
-    name: boinc-server-docker_default
-    external: true
+  boinc-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
